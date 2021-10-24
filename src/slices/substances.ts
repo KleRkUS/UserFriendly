@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, SliceCaseReducers } from "@reduxjs/toolkit";
 import { ISubstance } from "../types";
 
-type ISubstancesSlice = ISubstance[];
+export type ISubstancesSlice = ISubstance[];
 
 const initialState: ISubstancesSlice = [];
 

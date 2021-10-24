@@ -1,1 +1,5 @@
-export const getRandomColor = (): string => '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+export const getRandomColor = (): string => (
+    "hsl(" + 360 * Math.random() + ',' +
+               (25 + 70 * Math.random()) + '%,' + 
+               (85 + 10 * Math.random()) + '%)'
+)

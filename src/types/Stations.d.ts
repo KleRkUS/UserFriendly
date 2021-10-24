@@ -4,7 +4,8 @@ export interface IStation {
         lat: number;
         lng: number;
     };
-    name: string;
+    name?: string;
+    substances: { id: number }[];
 }
 
 export interface IDataRange {

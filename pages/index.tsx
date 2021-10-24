@@ -1,5 +1,4 @@
-import type { 
-    NextPage,
+import type {
     GetStaticProps,
     GetStaticPathsContext
 } from 'next';
@@ -10,11 +9,10 @@ import { StationInfo } from '../src/Components';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { IUseMap, useMap } from '../src/hooks';
 import { getAllDetailedStations, getDetailedSubstances } from '../src/helpers/queries';
-import { Layout } from '../src/Components/Layout';
+import { Layout } from '../src/Components';
 import { styled, Theme } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { saveSubstances } from '../src/slices/substances';
-import { formatSubstances } from '../src/helpers/formatters';
 
 interface ILoadedData {
     success: boolean;
@@ -62,7 +60,7 @@ const Home = ({
         changeActiveMarker(direction);
     }, [changeActiveMarker]);
 
-    const effectsCallback = (props: ILoadedStations | ILoadedSubstances, successCb: () => void) => {
+    const effectsCallback = useCallback((props: ILoadedStations | ILoadedSubstances, successCb: () => void) => {
         if (!props.success) {
             enqueueSnackbar(`Произошла ошибка при загрузке приложения, пожалуйста, перезагрузите страницу`, { variant: 'error' });
             setError(props.error);
@@ -71,19 +69,19 @@ const Home = ({
                 successCb()
             }
         }
-    }
+    }, [enqueueSnackbar, setError])
     
     useEffect(() => {
         effectsCallback(loadedStations, () => {
             initMap(loadedStations.data as IStation[]);
         })
-    }, [loadedStations]);
+    }, [loadedStations, effectsCallback, initMap]);
 
     useEffect(() => {
         effectsCallback(loadedSubstances, () => {
             dispatch(saveSubstances(loadedSubstances.data as ISubstance[]));
         })
-    }, [loadedSubstances])
+    }, [loadedSubstances, effectsCallback, dispatch])
 
     if (error !== null) return (
         <main className={`${css.root} ${css.errorContainer}`}>
@@ -94,11 +92,16 @@ const Home = ({
         </main>
     )
 
+    const stationData = loadedStations.data?.find((station: IStation) => station.id === activeMarker);
+    console.log(stationData);
+
     return (
         <SRoot >
             <div ref={ref} className={css.map}/>
             <StationInfo
                 stationId={activeMarker}
+                stationName={stationData?.name || "Неизвестно"}
+                stationSubstances={stationData?.substances || []}
                 onClose={removeActiveMarker}
                 onStationChange={handleStationChange}
             />

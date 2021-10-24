@@ -8,19 +8,25 @@ import {
     Theme
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { getDetailedStation } from '../../helpers/queries';
+import { getDetailedStation, IGetDataReturn } from '../../helpers/queries';
 import { StationButtons } from './StationButtons';
 import css from './StationInfo.module.css';
 import { CoreInfo } from './CoreInfo';
 import moment from 'moment';
+import { Chart } from './Chart';
+import { useSelector } from 'react-redux';
+import { IAppState } from '../../store';
+import { ISubstance } from '../../types';
 
 interface IProps {
     stationId: number | null;
+    stationSubstances: { id: number }[];
+    stationName: string;
     onClose(): void;
     onStationChange(direction: boolean): () => void;
 }
 
-type rangeType = 'week' | 'month' | 'year';
+export type rangeType = 'week' | 'month' | 'year';
 
 const SBox = styled(Box)<BoxProps>(({ theme }: { theme: Theme }) => ({
     backgroundColor: theme.palette.grey[800],
@@ -41,30 +47,33 @@ const SClickableBox = styled(Box)<BoxProps>(({ theme }: { theme: Theme}) => ({
 
 const SGrid = styled(Grid)<GridProps>(({ theme }: { theme: Theme }) => ({
     height: '100%',
-    padding: `0 ${theme.spacing(10)}`
+    padding: `${theme.spacing(3)} ${theme.spacing(10)}`
 }))
 
 export const StationInfo = ({
     stationId,
+    stationSubstances,
+    stationName,
     onClose,
     onStationChange
 }: IProps): JSX.Element => {
     const currentDate = moment('2021-01-01T19:00:00Z');
-    const [stationInfo, setStationInfo] = useState<any>(null);
+    const substances: ISubstance[] = useSelector((state: IAppState) => state.substances);
+    const [stationInfo, setStationInfo] = useState<IGetDataReturn | null>(null);
     const [rangeType, setRangeType] = useState<rangeType>('week');
 
-    const getStationInfo = async (fromDate: moment.Moment, toDate: moment.Moment) => {
-        const query = await getDetailedStation(Number(stationId) || 1);
+    const getStationInfo = async (fromDate?: moment.Moment, toDate?: moment.Moment) => {
+        const query: IGetDataReturn = await getDetailedStation(Number(stationId) || 1, fromDate, toDate);
         setStationInfo(query);
     }
 
     useEffect(() => {
         if (stationId !== null) {
             const fromDate = currentDate.startOf(rangeType);
-            const toDate = currentDate.endOf(rangeType);
-            getStationInfo(fromDate, toDate);
+            // const toDate = currentDate.endOf(rangeType);
+            getStationInfo(fromDate);
         }
-    }, [stationId])
+    }, [stationId, currentDate, rangeType, getStationInfo])
 
     return (
         <SBox className={`${css.stationInfo} ${stationId ? css.stationInfo_shown : css.stationInfo_hidden}`}>
@@ -82,7 +91,19 @@ export const StationInfo = ({
                 {stationId && stationInfo && (
                     <>
                         <StationButtons handleClick={onStationChange} />
-                        <CoreInfo data={stationInfo.data}/>
+                        <CoreInfo 
+                            data={stationInfo.data} 
+                            currentDate={currentDate}
+                            currentTimeRange={rangeType}
+                            stationName={stationName}
+                            substances={substances}
+                            onTimeRangeChange={setRangeType}
+                        />
+                        <Chart
+                            substances={substances}
+                            data={stationInfo.data}
+                            stationSubstances={stationSubstances}
+                        />
                     </>
                 )}
 

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { ISubstance } from "../types";
 import { IDataRange } from "../types/Stations";
 
@@ -22,6 +23,25 @@ export const formatStations = (stations: any[]) => (
         coords: {
             lng: station.location_y,
             lat: station.location_x
-        }
+        },
+        name: station.station_name,
+        substances: station.available_substances
     }))
+);
+
+export const filterIndications = (data: IDataRange[], currentDate: moment.Moment): IDataRange[] => (
+    data.filter((indication: IDataRange, index: number) => {
+        if (index === 0) return false;
+        
+        const prevIndication = data[index - 1];
+        const prevDate = moment(prevIndication.datetime);
+        const nextDate = moment(indication.datetime);
+
+        if (prevDate <= currentDate && nextDate >= currentDate) {
+            return Math.abs(prevDate.diff(currentDate)) > Math.abs(nextDate.diff(currentDate))
+                ? true
+                : false;
+        }
+        return false;
+    })
 );

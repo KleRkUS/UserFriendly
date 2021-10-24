@@ -69,11 +69,14 @@ export const getDetailedSubstances = async () => {
     return data;
 }
 
-export const getDetailedStation = async (id: number, fromDate: moment.Moment, toDate: moment.Moment) => {
+export const getDetailedStation = async (id: number, fromDate?: moment.Moment, toDate?: moment.Moment) => {
     const url = QueriesUrls.GetSingleStationDetails.replace("ID", String(id));
-    const fullUrl = `${url}?` + new URLSearchParams({ start_time: fromDate.toString(), end_time: toDate.toString() });
+    const searchParams: any = {};
+    if (fromDate) searchParams['start_time'] = fromDate.format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+    if (toDate) searchParams['end_time'] = toDate.format("YYYY-MM-DD[T]HH:mm:ss[Z]");
 
-    console.log(fullUrl, id, QueriesUrls.GetSingleStationDetails)
+    const fullUrl = `${url}?` + new URLSearchParams(searchParams);
+    
     const data = await getData({
         path: fullUrl,
         params: { 
