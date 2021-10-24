@@ -1,0 +1,1 @@
+export const getRandomColor = (): string => '#'+(Math.random()*0xFFFFFF<<0).toString(16);

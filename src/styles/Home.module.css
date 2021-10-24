@@ -1,0 +1,23 @@
+.root { 
+	height: 100vh;
+	width: 100%;
+}
+
+.errorContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.error {
+	text-align: center;
+}
+
+.error h3 {
+	margin-bottom: 20px;
+}
+
+.map {
+	height: 100%;
+	width: 100%;
+}
