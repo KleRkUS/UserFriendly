@@ -31,6 +31,7 @@ export type rangeType = 'week' | 'month' | 'year';
 const SBox = styled(Box)<BoxProps>(({ theme }: { theme: Theme }) => ({
     backgroundColor: theme.palette.grey[800],
     borderLeft: `${theme.spacing(4)} solid ${theme.palette.primary.dark}`,
+    right: `-${theme.spacing(20)}`
 }));
 
 const SClickableBox = styled(Box)<BoxProps>(({ theme }: { theme: Theme}) => ({
@@ -69,11 +70,17 @@ export const StationInfo = ({
 
     useEffect(() => {
         if (stationId !== null) {
+            setStationInfo(null);
             const fromDate = currentDate.startOf(rangeType);
             // const toDate = currentDate.endOf(rangeType);
             getStationInfo(fromDate);
         }
-    }, [stationId, currentDate, rangeType, getStationInfo])
+    }, [stationId, rangeType]);
+
+    const handleChangeStation = (direction: boolean) => () => {
+        setStationInfo(null);
+        onStationChange(direction);
+    }
 
     return (
         <SBox className={`${css.stationInfo} ${stationId ? css.stationInfo_shown : css.stationInfo_hidden}`}>
@@ -90,7 +97,7 @@ export const StationInfo = ({
 
                 {stationId && stationInfo && (
                     <>
-                        <StationButtons handleClick={onStationChange} />
+                        <StationButtons handleClick={handleChangeStation} />
                         <CoreInfo 
                             data={stationInfo.data} 
                             currentDate={currentDate}

@@ -2,10 +2,6 @@
     right: 0;
 }
 
-.stationInfo_hidden {
-    right: -0;
-}
-
 .stationInfo {
     position: absolute;
     top: 0;

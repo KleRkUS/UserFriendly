@@ -93,7 +93,6 @@ const Home = ({
     )
 
     const stationData = loadedStations.data?.find((station: IStation) => station.id === activeMarker);
-    console.log(stationData);
 
     return (
         <SRoot >

@@ -9,7 +9,7 @@ export interface IUseMarkers {
 }
 
 export const useMarkers = (): IUseMarkers => {
-    const [activeMarker, setActiveMarker] = useState<number | null>(1);
+    const [activeMarker, setActiveMarker] = useState<number | null>(null);
     const [stationsAmount, setStationsAmount] = useState<number | null>(null);
 
     const removeActiveMarker = useCallback(() => {
@@ -20,24 +20,24 @@ export const useMarkers = (): IUseMarkers => {
         setActiveMarker(id);
     }, [setActiveMarker]);
 
-    const changeActiveMarker = useCallback((isIncrement: boolean) => {
+    const changeActiveMarker = (isIncrement: boolean) => {
         const numerableInc: number = isIncrement ? 1 : -1;
 
         if (stationsAmount && activeMarker) {
-            setActiveMarker((oldId: number | null) => {
-                if (!oldId) return null;
+            const oldId = activeMarker;
+
+            if (!oldId) setActiveMarker(null);
 
                 const newId = oldId + numerableInc;
-                if (newId >= 0 && newId < stationsAmount) {
-                    return oldId + numerableInc;
-                } else if (newId < 0) {
-                    return stationsAmount - 1;
+                if (newId >= 1 && newId < stationsAmount) {
+                    setActiveMarker(oldId + numerableInc);
+                } else if (newId < 1) {
+                    setActiveMarker(stationsAmount);
                 } else {
-                    return 0;
-                }
-            });
+                    setActiveMarker(1);
+            }
         }
-    }, [setActiveMarker])
+    };
 
     const initMarkers = useCallback((map: typeof google.maps.Map, stations: IStation[]) => {
         if (stations) {
